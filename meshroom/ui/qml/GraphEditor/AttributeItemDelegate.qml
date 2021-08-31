@@ -1,6 +1,6 @@
-import QtQuick 2.9
+import QtQuick 2.15
 import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.15
 import MaterialIcons 2.2
 import Utils 1.0
 
@@ -194,7 +194,7 @@ RowLayout {
                 onActivated: _reconstruction.setAttribute(attribute, currentText)
                 Connections {
                     target: attribute
-                    onValueChanged: combo.currentIndex = combo.find(attribute.value)
+                    function onValueChanged() {combo.currentIndex = combo.find(attribute.value)}
                 }
             }
         }

@@ -1,5 +1,5 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.11
 import MaterialIcons 2.2
 
@@ -314,10 +314,8 @@ Item {
             return;
 
         loading = true;
-        var xhr = new XMLHttpRequest;
 
-        xhr.open("GET", root.source);
-        xhr.onreadystatechange = function() {
+        Request.get(root.source, function(xhr){
             // - can't rely on 'Last-Modified' header response to verify
             //   that file has changed on disk (not always up-to-date)
             // - instead, let QML engine evaluate whether 'text' property value has changed
@@ -328,7 +326,6 @@ Item {
                 if(autoReload)
                     reloadTimer.restart();
             }
-        };
-        xhr.send();
+        })
     }
 }

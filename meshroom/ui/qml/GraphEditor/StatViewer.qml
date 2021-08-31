@@ -1,5 +1,5 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtCharts 2.2
 import QtQuick.Layouts 1.11
 import Utils 1.0
@@ -97,12 +97,8 @@ Item {
         if(!Filepath.urlToString(source).endsWith("statistics"))
             return;
 
-        var xhr = new XMLHttpRequest;
-        xhr.open("GET", source);
-
-        xhr.onreadystatechange = function() {
+        Request.get(source, function(xhr){
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status == 200) {
-
                 if(sourceModified === undefined || sourceModified < xhr.getResponseHeader('Last-Modified')) {
                     try {
                         root.jsonObject = JSON.parse(xhr.responseText);
@@ -119,8 +115,7 @@ Item {
                     reloadTimer.restart();
                 }
             }
-        };
-        xhr.send();
+        })
     }
 
     function resetCharts() {

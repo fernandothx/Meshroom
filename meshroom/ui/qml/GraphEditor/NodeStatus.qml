@@ -1,5 +1,5 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import MaterialIcons 2.2
 import Controls 1.0
@@ -50,10 +50,7 @@ FocusScope {
                     if(!Filepath.urlToString(source).endsWith("status"))
                         return;
 
-                    var xhr = new XMLHttpRequest;
-                    xhr.open("GET", source);
-
-                    xhr.onreadystatechange = function() {
+                    Request.get(source, function(xhr) {
                         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                             // console.warn("StatusListModel: read valid file")
                             if(lastModified === undefined || lastModified !== xhr.getResponseHeader('Last-Modified')) {
@@ -88,8 +85,7 @@ FocusScope {
                             lastModified = undefined;
                             statusListModel.clear();
                         }
-                    };
-                    xhr.send();
+                    })
                 }
             }
 
