@@ -1,8 +1,8 @@
 import AlembicEntity 2.0
-import QtQuick 2.9
-import Qt3D.Core 2.1
-import Qt3D.Render 2.1
-import Qt3D.Extras 2.1
+import QtQuick 2.15
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
+import Qt3D.Extras 2.15
 
 /**
  * Support for Alembic files in Qt3d.
@@ -62,7 +62,7 @@ AlembicEntity {
                 },
                 CuboidMesh { id: cameraStick; xExtent: parent.extent * 0.2; yExtent: xExtent; zExtent: xExtent * 50.0 },
                 */
-                PhongMaterial{
+                PhongMaterial {
                     id: mat
                     ambient: viewId === _reconstruction.selectedViewId ? activePalette.highlight : customColor // "#CCC"
                     diffuse: cameraPicker.containsMouse ? Qt.lighter(activePalette.highlight, 1.2) : ambient
@@ -70,11 +70,11 @@ AlembicEntity {
                 ObjectPicker {
                     id: cameraPicker
                     property point pos
-                    onPressed: {
+                    onPressed: function (pick) {
                         pos = pick.position;
                         pick.accepted = (pick.buttons & Qt.LeftButton) && cameraPickingEnabled
                     }
-                    onReleased: {
+                    onReleased: function (pick) {
                         const delta = Qt.point(Math.abs(pos.x - pick.position.x), Math.abs(pos.y - pick.position.y));
                         // only trigger picking when mouse has not moved between press and release
                         if(delta.x + delta.y < 4)

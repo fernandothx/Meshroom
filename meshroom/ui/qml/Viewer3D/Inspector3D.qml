@@ -1,10 +1,9 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import MaterialIcons 2.2
-import Qt3D.Core 2.0
-import Qt3D.Render 2.1
-import QtQuick.Controls.Material 2.4
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
 import Controls 1.0
 import Utils 1.0
 
@@ -25,7 +24,10 @@ FloatingPane {
 
     padding: 0
 
-    MouseArea { anchors.fill: parent; onWheel: wheel.accepted = true }
+    MouseArea {
+        anchors.fill: parent;
+        onWheel: function (wheel) { wheel.accepted = true }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -185,12 +187,14 @@ FloatingPane {
 
                 Connections {
                     target: uigraph
-                    onSelectedNodeChanged: mediaListView.currentIndex = -1
+                    function onSelectedNodeChanged() {
+                        mediaListView.currentIndex = -1
+                    }
                 }
 
                 Connections {
                     target: mediaLibrary
-                    onLoadRequest: {
+                    function onLoadRequest(idx) {
                         mediaListView.positionViewAtIndex(idx, ListView.Visible);
                     }
                 }
@@ -210,12 +214,12 @@ FloatingPane {
                     }
 
                     height: childrenRect.height
-                    width: parent.width - scrollBar.width
+                    width: ListView.view.width - scrollBar.width
 
                     hoverEnabled: true
                     onEntered: { if(model.attribute) uigraph.hoveredNode = model.attribute.node }
                     onExited: { if(model.attribute) uigraph.hoveredNode = null }
-                    onClicked: {
+                    onClicked: function (mouse) {
                         if(model.attribute)
                             uigraph.selectedNode = model.attribute.node;
                         else
@@ -238,7 +242,7 @@ FloatingPane {
 
                         Connections {
                             target: mediaListView
-                            onCountChanged: mediaDelegate.updateCurrentIndex()
+                            function onCountChanged() { mediaDelegate.updateCurrentIndex() }
                         }
 
                         // Current/selected element indicator
@@ -275,9 +279,9 @@ FloatingPane {
                                 property int modifiers
                                 anchors.fill: parent
                                 hoverEnabled: true
-                                onPositionChanged: modifiers = mouse.modifiers
+                                onPositionChanged: function (mouse) { modifiers = mouse.modifiers; }
                                 onExited: modifiers = Qt.NoModifier
-                                onPressed: {
+                                onPressed: function (mouse) {
                                     modifiers = mouse.modifiers;
                                     mouse.accepted = false;
                                 }
@@ -340,7 +344,7 @@ FloatingPane {
                                     background: Rectangle {
                                         Connections {
                                             target: mediaLibrary
-                                            onLoadRequest: if(idx == index) focusAnim.restart()
+                                            function onLoadRequest(idx) { if(idx == index) focusAnim.restart() }
                                         }
                                         ColorAnimation on color {
                                             id: focusAnim

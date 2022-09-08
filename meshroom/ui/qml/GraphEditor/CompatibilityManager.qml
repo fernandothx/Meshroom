@@ -1,5 +1,5 @@
-import QtQuick 2.9
-import QtQuick.Controls 2.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import MaterialIcons 2.2
 import Controls 1.0
@@ -70,7 +70,7 @@ MessageDialog {
             headerPositioning: ListView.OverlayHeader
             header: Pane {
                 z: 2
-                width: ListView.view.width
+                width: parent.width
                 padding: 6
                 background: Rectangle { color: Qt.darker(parent.palette.window, 1.15) }
                 RowLayout {

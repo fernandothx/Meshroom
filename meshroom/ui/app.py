@@ -3,9 +3,9 @@ import os
 import re
 import argparse
 
-from PySide2.QtCore import Qt, QUrl, Slot, QJsonValue, Property, Signal, qInstallMessageHandler, QtMsgType, QSettings
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QApplication
+from PySide6.QtCore import Qt, QUrl, Slot, QJsonValue, Property, Signal, qInstallMessageHandler, QtMsgType, QSettings
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication
 
 import meshroom
 from meshroom.core import nodesDesc
@@ -70,7 +70,7 @@ class MessageHandler(object):
 class MeshroomApp(QApplication):
     """ Meshroom UI Application. """
     def __init__(self, args):
-        QtArgs = [args[0], '-style', 'fusion'] + args[1:]  # force Fusion style by default
+        QtArgs = [args[0], '-style', 'Fusion'] + args[1:]  # force Fusion style by default
 
         parser = argparse.ArgumentParser(prog=args[0], description='Launch Meshroom UI.', add_help=True)
 
@@ -186,7 +186,7 @@ class MeshroomApp(QApplication):
             r.saveAs(args.save)
             self.addRecentProjectFile(args.save)
 
-        self.engine.load(os.path.normpath(url))
+        self.engine.load('file:///' + os.path.normpath(url).replace('\\', '/'))
 
     def _pipelineTemplateFiles(self):
         templates = []

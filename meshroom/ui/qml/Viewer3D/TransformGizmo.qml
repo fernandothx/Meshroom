@@ -1,10 +1,10 @@
-import Qt3D.Core 2.0
-import Qt3D.Render 2.9
-import Qt3D.Input 2.0
-import Qt3D.Extras 2.10
-import QtQuick 2.9
-import Qt3D.Logic 2.0
-import QtQuick.Controls 2.3
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
+import Qt3D.Input 2.15
+import Qt3D.Extras 2.15
+import QtQuick 2.15
+import Qt3D.Logic 2.15
+import QtQuick.Controls 2.15
 import Utils 1.0
 
 
@@ -208,7 +208,7 @@ Entity {
         property var objectPicker: null
         property bool enabled: false
 
-        onPositionChanged: {
+        onPositionChanged: function (mouse) {
             if (objectPicker && objectPicker.button === Qt.LeftButton) {
                 root.focusGizmoPriority = true
 
@@ -276,7 +276,7 @@ Entity {
                 resetMenu.popup(window)
             }
         }
-        onReleased: {
+        onReleased: function (mouse) {
             if(objectPicker && mouse.button === Qt.LeftButton) {
                 const type = objectPicker.gizmoType
                 objectPicker = null // To prevent going again in the onPositionChanged

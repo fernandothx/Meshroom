@@ -1,6 +1,5 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.3
-import QtQuick.Controls 1.4 as Controls1 // For SplitView
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import Qt.labs.platform 1.0 as Platform
 import ImageGallery 1.0
@@ -38,13 +37,13 @@ Item {
 
     Connections {
         target: reconstruction
-        onGraphChanged: {
+        function onGraphChanged() {
             if(panel3dViewerLoader.active) {
                 panel3dViewerLoader.item.viewer3D.clear()
             }
         }
-        onSfmChanged: viewSfM()
-        onSfmReportChanged: viewSfM()
+        function onSfmChanged() { viewSfM() }
+        function onSfmReportChanged() { viewSfM() }
     }
     Component.onCompleted: viewSfM()
 
@@ -60,32 +59,32 @@ Item {
 
     SystemPalette { id: activePalette }
 
-    Controls1.SplitView {
+    SplitView {
         anchors.fill: parent
 
-        Controls1.SplitView {
+        SplitView {
             orientation: Qt.Vertical
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            implicitWidth: Math.round(parent.width * 0.2)
-            Layout.minimumWidth: imageGallery.defaultCellSize
+            SplitView.fillWidth: true
+            SplitView.fillHeight: true
+            SplitView.preferredWidth : Math.round(parent.width * 0.2)
+            SplitView.minimumWidth: imageGallery.defaultCellSize
 
             ImageGallery {
                 id: imageGallery
-                Layout.fillHeight: true
+                SplitView.fillHeight: true
                 readOnly: root.readOnly
                 cameraInits: root.cameraInits
                 cameraInit: reconstruction.cameraInit
                 tempCameraInit: reconstruction.tempCameraInit
                 cameraInitIndex: reconstruction.cameraInitIndex
-                onRemoveImageRequest: reconstruction.removeAttribute(attribute)
-                onFilesDropped: reconstruction.handleFilesDrop(drop, augmentSfm ? null : cameraInit)
+                onRemoveImageRequest: function (attribute) { reconstruction.removeAttribute(attribute) }
+                onFilesDropped: function (drop, augmentSfm) { reconstruction.handleFilesDrop(drop, augmentSfm ? null : cameraInit) }
             }
             LiveSfmView {
                 visible: settings_UILayout.showLiveReconstruction
                 reconstruction: root.reconstruction
-                Layout.fillWidth: true
-                Layout.preferredHeight: childrenRect.height
+                SplitView.fillWidth: true
+                SplitView.preferredHeight: childrenRect.height
             }
         }
 
@@ -93,9 +92,9 @@ Item {
             title: "Image Viewer"
             visible: settings_UILayout.showImageViewer
             implicitWidth: Math.round(parent.width * 0.35)
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.minimumWidth: 50
+            SplitView.fillHeight: true
+            SplitView.fillWidth: true
+            SplitView.minimumWidth: 50
             loading: viewer2D.loadingModules.length > 0
             loadingText: loading ? "Loading " + viewer2D.loadingModules : ""
 
@@ -150,7 +149,7 @@ Item {
 
                 Connections {
                     target: imageGallery
-                    onCurrentItemChanged: {
+                    function onCurrentItemChanged() {
                         viewer2D.source = imageGallery.currentItemSource
                         viewer2D.metadata = imageGallery.currentItemMetadata
                     }
@@ -159,7 +158,7 @@ Item {
                 DropArea {
                     anchors.fill: parent
                     keys: ["text/uri-list"]
-                    onDropped: {
+                    onDropped: function (drop) {
                         viewer2D.source = drop.urls[0]
                         viewer2D.metadata = {}
                     }
@@ -197,20 +196,20 @@ Item {
   
                 property alias viewer3D: c_viewer3D
 
-                Controls1.SplitView {
+                SplitView {
                     id: c_viewer3DSplitView
                     anchors.fill: parent
                     Viewer3D {
                         id: c_viewer3D
 
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.minimumWidth: 20
+                        SplitView.fillWidth: true
+                        SplitView.fillHeight: true
+                        SplitView.minimumWidth: 20
 
                         DropArea {
                             anchors.fill: parent
                             keys: ["text/uri-list"]
-                            onDropped: {
+                            onDropped: function (drop) {
                                 drop.urls.forEach(function(url){ load3DMedia(url); });
                             }
                         }
@@ -233,13 +232,13 @@ Item {
                     // Inspector Panel
                     Inspector3D {
                         id: inspector3d
-                        width: 200
-                        Layout.minimumWidth: 5
+                        SplitView.preferredWidth: 200
+                        SplitView.minimumWidth: 5
 
                         mediaLibrary: c_viewer3D.library
                         camera: c_viewer3D.mainCamera
                         uigraph: reconstruction
-                        onNodeActivated: _reconstruction.setActiveNode(node)
+                        onNodeActivated: function (node) { _reconstruction.setActiveNode(node) }
                     }
                 }
             }

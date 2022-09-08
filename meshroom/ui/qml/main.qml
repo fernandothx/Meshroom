@@ -1,12 +1,10 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.3
-import QtQuick.Controls 1.4 as Controls1 // For SplitView
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.3
 import QtQml.Models 2.2
 
 import Qt.labs.platform 1.0 as Platform
-import QtQuick.Dialogs 1.3
 
 import Qt.labs.settings 1.0
 import GraphEditor 1.0
@@ -31,7 +29,7 @@ ApplicationWindow {
         return t
     }
 
-    onClosing: {
+    onClosing: function(close) {
         // make sure document is saved before exiting application
         close.accepted = false
         if(!ensureNotComputing())
@@ -39,10 +37,28 @@ ApplicationWindow {
         ensureSaved(function(){ Qt.quit() })
     }
 
-    // force Application palette assignation
-    // note: should be implicit (PySide bug)
-    palette: _PaletteManager.palette
-
+    // QPalette is not convertible to QML palette (anymore)
+    Component.onCompleted: {
+        palette.alternateBase = _PaletteManager.alternateBase
+        palette.base = _PaletteManager.base
+        palette.button = _PaletteManager.button
+        palette.buttonText = _PaletteManager.buttonText
+        palette.disabled.buttonText = _PaletteManager.disabledButtonText
+        palette.highlight = _PaletteManager.highlight
+        palette.disabled.highlight = _PaletteManager.disabledHighlight
+        palette.highlightedText = _PaletteManager.highlightedText
+        palette.disabled.highlightedText = _PaletteManager.disabledHighlightedText
+        palette.link = _PaletteManager.link
+        palette.mid = _PaletteManager.mid
+        palette.shadow = _PaletteManager.shadow
+        palette.text = _PaletteManager.text
+        palette.disabled.text = _PaletteManager.disabledText
+        palette.toolTipBase = _PaletteManager.toolTipBase
+        palette.toolTipText = _PaletteManager.toolTipText
+        palette.window = _PaletteManager.window
+        palette.windowText = _PaletteManager.windowText
+        palette.disabled.windowText = _PaletteManager.disabledWindowText
+    }
     SystemPalette { id: activePalette }
     SystemPalette { id: disabledPalette; colorGroup: SystemPalette.Disabled }
 
@@ -312,8 +328,7 @@ ApplicationWindow {
     FileDialog {
         id: importFilesDialog
         title: "Import Images"
-        selectExisting: true
-        selectMultiple: true
+        fileMode: FileDialog.OpenFiles
         nameFilters: []
         onAccepted: {
             console.warn("importFilesDialog fileUrls: " + importFilesDialog.fileUrls)
@@ -688,7 +703,7 @@ ApplicationWindow {
             dialog.detailedText = message.detailedText
         }
 
-        onGraphChanged: {
+        function onGraphChanged() {
             // open CompatibilityManager after file loading if any issue is detected
             if(compatibilityManager.issueCount)
                 compatibilityManager.open()
@@ -696,13 +711,13 @@ ApplicationWindow {
             graphEditor.fit()
         }
 
-        onInfo: createDialog(dialogsFactory.info, arguments[0])
-        onWarning: createDialog(dialogsFactory.warning, arguments[0])
-        onError: createDialog(dialogsFactory.error, arguments[0])
+        function onInfo() { createDialog(dialogsFactory.info, arguments[0]) }
+        function onWarning() { createDialog(dialogsFactory.warning, arguments[0]) }
+        function onError() { createDialog(dialogsFactory.error, arguments[0]) }
     }
 
 
-    Controls1.SplitView {
+    SplitView {
         anchors.fill: parent
         orientation: Qt.Vertical
 
@@ -710,8 +725,8 @@ ApplicationWindow {
         ToolTip.toolTip.background: Rectangle { color: activePalette.base; border.color: activePalette.mid }
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            SplitView.fillWidth: true
+            SplitView.fillHeight: true
             Layout.topMargin: 2
             implicitHeight: Math.round(parent.height * 0.7)
             spacing: 4
@@ -818,15 +833,16 @@ ApplicationWindow {
             }
         }
 
-        Controls1.SplitView {
+        SplitView {
             orientation: Qt.Horizontal
-            width: parent.width
-            height: Math.round(parent.height * 0.3)
+            SplitView.preferredWidth: parent.width
+            SplitView.preferredHeight: Math.round(parent.height * 0.3)
             visible: settings_UILayout.showGraphEditor
 
             TabPanel {
                 id: graphEditorPanel
-                Layout.fillWidth: true
+                SplitView.fillWidth: true
+                width: Math.round(parent.width * 0.7)
                 padding: 4
                 tabs: ["Graph Editor", "Task Manager"]
 
@@ -878,7 +894,7 @@ ApplicationWindow {
                     uigraph: _reconstruction
                     nodeTypesModel: _nodeTypes
 
-                    onNodeDoubleClicked: {
+                    onNodeDoubleClicked: function (mouse, node) {
                         _reconstruction.setActiveNode(node);
 
                         let viewable = false;
@@ -889,8 +905,8 @@ ApplicationWindow {
                                 break;
                         }
                     }
-                    onComputeRequest: computeManager.compute(node)
-                    onSubmitRequest: computeManager.submit(node)
+                    onComputeRequest: function (node) { computeManager.compute(node) }
+                    onSubmitRequest: function (node) { computeManager.submit(node) }
                 }
 
                 TaskManager {
@@ -908,13 +924,13 @@ ApplicationWindow {
 
             NodeEditor {
                 id: nodeEditor
-                width: Math.round(parent.width * 0.3)
+                SplitView.preferredWidth: Math.round(parent.width * 0.3)
                 node: _reconstruction.selectedNode
                 property bool computing: _reconstruction.computing
                 // Make NodeEditor readOnly when computing
                 readOnly: node ? node.locked : false
 
-                onAttributeDoubleClicked: workspaceView.viewAttribute(attribute, mouse)
+                onAttributeDoubleClicked: function (mouse, attribute) { workspaceView.viewAttribute(attribute, mouse) }
                 onUpgradeRequest: {
                     var n = _reconstruction.upgradeNode(node);
                     _reconstruction.selectedNode = n;

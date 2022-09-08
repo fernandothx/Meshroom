@@ -1,13 +1,12 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.3
-import QtQuick.Controls 1.4 as Controls1
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.2
 import QtQuick.Scene3D 2.0
-import Qt3D.Core 2.1
-import Qt3D.Render 2.1
-import Qt3D.Extras 2.10
-import Qt3D.Input 2.1 as Qt3DInput // to avoid clash with Controls2 Action
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
+import Qt3D.Extras 2.15
+import Qt3D.Input 2.15 as Qt3DInput // to avoid clash with Controls2 Action
 
 import MaterialIcons 2.2
 
@@ -73,7 +72,7 @@ FocusScope {
         focus: true
 
 
-        Keys.onPressed: {
+        Keys.onPressed: function (event) {
             if (event.key == Qt.Key_F) {
                 resetCameraPosition();
             }
@@ -127,7 +126,7 @@ FocusScope {
 
             TrackballGizmo {
                 beamRadius: 4.0/root.height
-                alpha: cameraController.moving ? 1.0 : 0.7
+                alpha: 0.7  // cameraController.moving ? 1.0 : 0.7
                 enabled: Viewer3DSettings.displayGizmo && cameraSelector.camera == mainCamera
                 xColor: Colors.red
                 yColor: Colors.green
@@ -152,7 +151,7 @@ FocusScope {
 
                 camera: mainCamera
                 focus: scene3D.activeFocus
-                onMousePressed: {
+                onMousePressed: function (mouse) {
                     scene3D.forceActiveFocus()
                     if(mouse.button == Qt.LeftButton)
                     {
@@ -162,7 +161,7 @@ FocusScope {
                     else
                         doubleClickTimer.stop()
                 }
-                onMouseReleased: {
+                onMouseReleased: function (mouse, moved) {
                     if(moving)
                         return
                     if(!moved && mouse.button == Qt.RightButton)
@@ -245,7 +244,7 @@ FocusScope {
                     }
                 ]
 
-                onPressed: {
+                onPressed: function (pick) {
                     if(pick.button == Qt.LeftButton)
                     {
                         mainCamera.viewCenter = pick.worldIntersection;
@@ -269,6 +268,7 @@ FocusScope {
 
         sourceComponent: ImageOverlay {
             id: imageOverlay
+            anchors.fill: parent
             source: root.viewpoint.undistortedImageSource
             imageRatio: root.viewpoint.orientedImageSize.width / root.viewpoint.orientedImageSize.height
             uvCenterOffset: root.viewpoint.uvCenterOffset

@@ -1,7 +1,7 @@
-import QtQuick 2.7
-import Qt3D.Core 2.0
-import Qt3D.Render 2.0
-import Qt3D.Extras 2.0
+import QtQuick 2.15
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
+import Qt3D.Extras 2.15
 
 // Grid
 Entity {
@@ -18,7 +18,6 @@ Entity {
                     count: 0
                     name: defaultPositionAttributeName
                     buffer: Buffer {
-                        type: Buffer.VertexBuffer
                         data: {
                             function buildGrid(first, last, offset, attribute) {
                                 var vertexCount = (((last-first)/offset)+1)*4;

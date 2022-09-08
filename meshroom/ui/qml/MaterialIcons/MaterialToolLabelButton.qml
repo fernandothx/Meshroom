@@ -1,5 +1,5 @@
-import QtQuick 2.9
-import QtQuick.Controls 2.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 
 
@@ -36,7 +36,7 @@ ToolButton {
     }
     background: Rectangle {
         color: {
-            if(pressed || checked || hovered)
+            if(enabled && (pressed || checked || hovered))
             {
                 if(pressed || checked)
                     return Qt.darker(parent.palette.base, 1.3)

@@ -1,7 +1,7 @@
-import QtQuick 2.9
-import Qt3D.Core 2.1
-import Qt3D.Render 2.1
-import Qt3D.Extras 2.10
+import QtQuick 2.15
+import Qt3D.Core 2.15
+import Qt3D.Render 2.15
+import Qt3D.Extras 2.15
 import QtQuick.Scene3D 2.0
 import "Materials"
 import Utils 1.0
@@ -68,7 +68,7 @@ import Utils 1.0
             components: [
                 SceneLoader {
                     source: parent.source
-                    onStatusChanged: {
+                    onStatusChanged: function (status) {
                         if(status == SceneLoader.Ready) {
                             textureCount = sceneLoaderPostProcess(sceneLoaderEntity);
                             faceCount = Scene3DHelper.faceCount(sceneLoaderEntity)

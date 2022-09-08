@@ -1,6 +1,6 @@
-import QtQuick 2.9
+import QtQuick 2.15
 import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.15
 import MaterialIcons 2.2
 import Utils 1.0
 
@@ -62,7 +62,7 @@ RowLayout {
                     anchors.fill: parent
                     hoverEnabled: true
                     acceptedButtons: Qt.AllButtons
-                    onDoubleClicked: root.doubleClicked(mouse, root.attribute)
+                    onDoubleClicked: function (mouse) { root.doubleClicked(mouse, root.attribute) }
 
                     property Component menuComp: Menu {
                         id: paramMenu
@@ -97,7 +97,7 @@ RowLayout {
                         }
                     }
 
-                    onClicked: {
+                    onClicked: function (mouse) {
                         forceActiveFocus()
                         if(mouse.button == Qt.RightButton)
                         {
@@ -174,7 +174,7 @@ RowLayout {
                 DropArea {
                     enabled: root.editable
                     anchors.fill: parent
-                    onDropped: {
+                    onDropped: function (drop) {
                         if(drop.hasUrls)
                             setTextFieldAttribute(Filepath.urlToString(drop.urls[0]))
                         else if(drop.hasText && drop.text != '')
@@ -194,7 +194,7 @@ RowLayout {
                 onActivated: _reconstruction.setAttribute(attribute, currentText)
                 Connections {
                     target: attribute
-                    onValueChanged: combo.currentIndex = combo.find(attribute.value)
+                    function onValueChanged() {combo.currentIndex = combo.find(attribute.value)}
                 }
             }
         }
@@ -429,16 +429,7 @@ RowLayout {
                         width: control.availableWidth
                         height: control.availableHeight
                         blending: false
-                        fragmentShader: "
-                            varying mediump vec2 qt_TexCoord0;
-                            vec3 hsv2rgb(vec3 c) {
-                                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-                                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-                            }
-                            void main() {
-                                gl_FragColor = vec4(hsv2rgb(vec3(qt_TexCoord0.x, 1.0, 1.0)), 1.0);
-                            }"
+                        fragmentShader: 'qrc:/shaders/AttributeItemDelegate.frag.qsb'
                     }
                 }
             }

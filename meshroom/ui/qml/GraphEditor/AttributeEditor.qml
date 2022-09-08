@@ -1,6 +1,6 @@
-import QtQuick 2.9
+import QtQuick 2.15
 import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.15
 import MaterialIcons 2.2
 import Utils 1.0
 
@@ -32,7 +32,7 @@ ListView {
             readOnly: root.readOnly
             labelWidth: root.labelWidth
             attribute: object
-            onDoubleClicked: root.attributeDoubleClicked(mouse, attr)
+            onDoubleClicked: function (mouse) { root.attributeDoubleClicked(mouse, attr) }
         }
     }
 
