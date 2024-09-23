@@ -12,6 +12,7 @@ RowLayout {
 
     property var nodeItem
     property var attribute
+    property bool expanded: false
     property bool readOnly: false
     /// Whether to display an output pin for input attribute
     property bool displayOutputPinForInput: true
@@ -24,12 +25,15 @@ RowLayout {
                                                       outputAnchor.y + outputAnchor.height / 2)
 
     readonly property bool isList: attribute && attribute.type === "ListAttribute"
+    readonly property bool isGroup: attribute && attribute.type === "GroupAttribute"
 
     signal childPinCreated(var childAttribute, var pin)
     signal childPinDeleted(var childAttribute, var pin)
 
     signal pressed(var mouse)
     signal edgeAboutToBeRemoved(var input)
+
+    signal clicked()
 
     objectName: attribute ? attribute.name + "." : ""
     layoutDirection: Qt.LeftToRight
@@ -43,14 +47,30 @@ RowLayout {
         x: nameLabel.x
     }
 
-    function updatePin(isSrc, isVisible)
-    {
+    function updatePin(isSrc, isVisible) {
         if (isSrc) {
             innerOutputAnchor.linkEnabled = isVisible
         } else {
             innerInputAnchor.linkEnabled = isVisible
         }
+    }
 
+    function updateLabel() {
+        var label = ""
+        var expandedGroup = expanded ? "-" : "+"
+        if (attribute && attribute.label !== undefined) {
+            label = attribute.label
+            if (isGroup && attribute.isOutput) {
+                label = label + " " + expandedGroup
+            } else if (isGroup && !attribute.isOutput) {
+                label = expandedGroup + " " + label
+            }
+        }
+        return label
+    }
+
+    onExpandedChanged: {
+        nameLabel.text = updateLabel()
     }
 
     // Instantiate empty Items for each child attribute
@@ -164,12 +184,9 @@ RowLayout {
             anchors.margins: inputDropArea.anchors.margins
             anchors.leftMargin: inputDropArea.anchors.leftMargin
             anchors.rightMargin: inputDropArea.anchors.rightMargin
-            onPressed: {
-                root.pressed(mouse)
-            }
-            onReleased: {
-                inputDragTarget.Drag.drop()
-            }
+            onPressed: root.pressed(mouse)
+            onReleased: inputDragTarget.Drag.drop()
+            onClicked: root.clicked()
             hoverEnabled: true
         }
 
@@ -186,7 +203,6 @@ RowLayout {
     }
 
 
-
     // Attribute name
     Item {
         id: nameContainer
@@ -199,8 +215,9 @@ RowLayout {
             id: nameLabel
 
             enabled: !root.readOnly
+            visible: true
             property bool hovered: (inputConnectMA.containsMouse || inputConnectMA.drag.active || inputDropArea.containsDrag || outputConnectMA.containsMouse || outputConnectMA.drag.active || outputDropArea.containsDrag)
-            text: (attribute && attribute.label) !== undefined ? attribute.label : ""
+            text: root.updateLabel()
             elide: hovered ? Text.ElideNone : Text.ElideMiddle
             width: hovered ? contentWidth : parent.width
             font.pointSize: 7
@@ -315,6 +332,7 @@ RowLayout {
 
             onPressed: root.pressed(mouse)
             onReleased: outputDragTarget.Drag.drop()
+            onClicked: root.clicked()
 
             hoverEnabled: true
         }
