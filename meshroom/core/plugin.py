@@ -298,7 +298,7 @@ def getCommandLine(chunk):
         raise RuntimeError("The project needs to be saved to use plugin nodes")
     saved_graph = loadGraph(chunk.node.graph.filepath)
     if (str(chunk.node) not in [str(f) for f in saved_graph._nodes._objects]
-        or chunk.node._uids[0] != saved_graph.findNode(str(chunk.node))._uids[0] ):
+        or chunk.node._uid != saved_graph.findNode(str(chunk.node))._uid ):
         raise RuntimeError("The changes needs to be saved to use plugin nodes")
 
     cmdPrefix = ""
@@ -342,7 +342,7 @@ def getCommandLine(chunk):
         
     return command
 
-# you may use these to esplicitly define Pluginnodes
+# you may use these to explicitly define Pluginnodes
 class PluginNode(desc.Node):
     pass
 
